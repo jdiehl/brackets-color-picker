@@ -62,6 +62,7 @@ define(function (require, exports, module) {
 		return null;
 	}
 
+	var _colorPicker;
 	function colorPickerProvider(hostEditor, pos) {
 		
 		// Only provide color picker if there is a HEX color under the cursor
@@ -71,11 +72,17 @@ define(function (require, exports, module) {
 		var color = colorToken.string.substr(1);
 		pos.ch = colorToken.start + 1;
 
-		var colorPicker = new InlineColorPicker(color, pos);
-		colorPicker.load(hostEditor);
+		if (_colorPicker && !_colorPicker.closed) {
+			_colorPicker.close();
+			var oldPos = _colorPicker.pos;
+			_colorPicker = undefined;
+			if (oldPos.line === pos.line && oldPos.ch === pos.ch) return null;
+		}
+		_colorPicker = new InlineColorPicker(color, pos);
+		_colorPicker.load(hostEditor);
 		
 		var result = new $.Deferred();
-		result.resolve(colorPicker);
+		result.resolve(_colorPicker);
 		return result.promise();
 	}
 
