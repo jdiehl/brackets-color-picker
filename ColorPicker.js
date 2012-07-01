@@ -333,7 +333,7 @@ define(function (require, exports, module) {
 				}
 				hsb.s *= 100/255;
 				hsb.b *= 100/255;
-				return hsb;
+				return { h: Math.round(hsb.h), s: Math.round(hsb.s), b: Math.round(hsb.b) };
 			},
 			HSBToRGB = function (hsb) {
 				var rgb = {};
