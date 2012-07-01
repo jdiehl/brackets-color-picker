@@ -84,5 +84,13 @@ define(function (require, exports, module) {
 		EditorManager.registerInlineEditProvider(colorPickerProvider);
 	}
 
+	function unload() {
+		// this is missing
+		// EditorManager.unregisterInlineEditProvider(colorPickerProvider);
+	}
+
 	$(init);
+
+	exports.init = init;
+	exports.unload = unload;
 });
