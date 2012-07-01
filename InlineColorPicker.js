@@ -89,7 +89,7 @@ define(function (require, exports, module) {
 	};
 
 	InlineColorPicker.prototype._sizeEditorToContent = function () {
-		this.hostEditor.setInlineWidgetHeight(this, this.$wrapperDiv.height() + 20, true);
+		this.hostEditor.setInlineWidgetHeight(this, this.$wrapperDiv.height(), true);
 	};
 
 	module.exports = InlineColorPicker;
