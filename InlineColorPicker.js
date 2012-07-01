@@ -80,6 +80,7 @@ define(function (require, exports, module) {
 		if (this.closed) return;
 		this.closed = true;
 		this.hostEditor.removeInlineWidget(this);
+		if (this.onClose) this.onClose(this);
 	};
 
 	InlineColorPicker.prototype.onAdded = function () {

@@ -35,6 +35,8 @@ define(function (require, exports, module) {
 	// Local modules
 	var InlineColorPicker       = require("InlineColorPicker");
 
+	var _colorPickers = {};
+
 	function loadCSS() {
 		$("<link rel='stylesheet' type='text/css'>").attr("href", require.toUrl("css/colorpicker.css")).appendTo(window.document.head);
 	}
@@ -62,27 +64,42 @@ define(function (require, exports, module) {
 		return null;
 	}
 
-	var _colorPicker;
+	// convert pos object to index string
+	function posToIndex(pos) {
+		return "" + pos.line + ":" + pos.ch;
+	}
+
+	// remove a closed color picker from the index
+	function onClose(colorPicker) {
+		delete _colorPickers[posToIndex(colorPicker.pos)];
+	}
+
+	// provide a new color picker or close an existing one
 	function colorPickerProvider(hostEditor, pos) {
 		
 		// Only provide color picker if there is a HEX color under the cursor
 		var colorToken = getColorTokenAtPos(hostEditor, pos);
 		if (!colorToken) return null;
 
-		var color = colorToken.string.substr(1);
+		// the color starts at the token position + 1 (#)
 		pos.ch = colorToken.start + 1;
 
-		if (_colorPicker && !_colorPicker.closed) {
-			_colorPicker.close();
-			var oldPos = _colorPicker.pos;
-			_colorPicker = undefined;
-			if (oldPos.line === pos.line && oldPos.ch === pos.ch) return null;
+		// get an existing color picker and close it
+		var colorPicker = _colorPickers[posToIndex(pos)];
+		if (colorPicker) {
+			colorPicker.close();
+			return null;
 		}
-		_colorPicker = new InlineColorPicker(color, pos);
-		_colorPicker.load(hostEditor);
-		
+
+		// create a new color picker
+		colorPicker = new InlineColorPicker(colorToken.string.substr(1), pos);
+		colorPicker.onClose = onClose;
+		colorPicker.load(hostEditor);
+		_colorPickers[posToIndex(pos)] = colorPicker;
+
+		// resolve
 		var result = new $.Deferred();
-		result.resolve(_colorPicker);
+		result.resolve(colorPicker);
 		return result.promise();
 	}
 
