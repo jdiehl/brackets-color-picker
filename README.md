@@ -6,15 +6,16 @@ Edit hex colors with a color picker.
 
 Clone the extension manager into the disabled extensions folder from Brackets:
 
-    git clone git://github.com/jdiehl/brackets-color-picker.git brackets/src/extensions/disabled/ColorPicker
+    git clone git://github.com/jdiehl/brackets-color-picker.git brackets/src/extensions/disabled/color-picker
 
 Create a link to enable the extension manager:
 
-    ln -s brackets/src/extensions/disabled/ColorPicker brackets/src/extensions/user/ColorPicker
+    ln -s brackets/src/extensions/disabled/color-picker brackets/src/extensions/user/color-picker
 
 ## Run
 
-Press CMD-E with the cursor on a hex color code (#ffaaaa)
+Press CMD-E with the cursor on a hex color code (#ffaaaa).
+Note, that you must drag the mouse cursor to change colors (a click will close the color picker).
 
 ## License
 
