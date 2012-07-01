@@ -143,6 +143,8 @@ define(function (require, exports, module) {
 				current.preview = current.cal.data('colorpicker').livePreview;
 				$(document).bind('mouseup', current, upHue);
 				$(document).bind('mousemove', current, moveHue);
+				ev.data = current;
+				moveHue(ev);
 			},
 			moveHue = function (ev) {
 				change.apply(
@@ -170,6 +172,8 @@ define(function (require, exports, module) {
 				current.preview = current.cal.data('colorpicker').livePreview;
 				$(document).bind('mouseup', current, upSelector);
 				$(document).bind('mousemove', current, moveSelector);
+				ev.data = current;
+				moveSelector(ev);
 			},
 			moveSelector = function (ev) {
 				change.apply(
