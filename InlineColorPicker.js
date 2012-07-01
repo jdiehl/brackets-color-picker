@@ -45,9 +45,8 @@ define(function (require, exports, module) {
 	InlineColorPicker.prototype.$wrapperDiv = null;
 
 	InlineColorPicker.prototype.setColor = function (hex) {
-		var cm = this.editor._codeMirror;
 		var end = { line: this.pos.line, ch: this.pos.ch + this.color.length };
-		cm.replaceRange(hex, this.pos, end);
+		this.editor.document.replaceRange(hex, this.pos, end);
 		this.color = hex;
 	};
 
@@ -66,8 +65,18 @@ define(function (require, exports, module) {
 			}
 		});
 
-        this.$htmlContent.append(this.$wrapperDiv);
-        this.$htmlContent.click(this.close.bind(this));
+		this.$htmlContent.append(this.$wrapperDiv);
+		$(document).on('mousedown.InlineColorPicker', this.onDocumentClick.bind(this));
+	};
+
+	// Close the color picker when clicking somewhere outside of it
+	InlineColorPicker.prototype.onDocumentClick = function (event) {
+		// Ignore clicks inside the actual color picker's area
+		if ($(event.target).closest('div.colorpicker').length) { return; }
+		// Remove this event handler
+		$(document).off('mousedown.InlineColorPicker');
+		// Close the inline color picker
+		this.close();
 	};
 
 	InlineColorPicker.prototype.close = function () {
@@ -79,7 +88,7 @@ define(function (require, exports, module) {
 	};
 
 	InlineColorPicker.prototype._sizeEditorToContent = function () {
-		this.hostEditor.setInlineWidgetHeight(this, this.$wrapperDiv.height() + 20, true);
+		this.hostEditor.setInlineWidgetHeight(this, this.$wrapperDiv.height(), true);
 	};
 
 	module.exports = InlineColorPicker;
