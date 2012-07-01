@@ -66,8 +66,18 @@ define(function (require, exports, module) {
 			}
 		});
 
-        this.$htmlContent.append(this.$wrapperDiv);
-        this.$htmlContent.click(this.close.bind(this));
+		this.$htmlContent.append(this.$wrapperDiv);
+		$(document).on('mousedown.InlineColorPicker', this.onDocumentClick.bind(this));
+	};
+
+	// Close the color picker when clicking somewhere outside of it
+	InlineColorPicker.prototype.onDocumentClick = function (event) {
+		// Ignore clicks inside the actual color picker's area
+		if ($(event.target).closest('div.colorpicker').length) { return; }
+		// Remove this event handler
+		$(document).off('mousedown.InlineColorPicker');
+		// Close the inline color picker
+		this.close();
 	};
 
 	InlineColorPicker.prototype.close = function () {
