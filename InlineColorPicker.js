@@ -65,14 +65,15 @@ define(function (require, exports, module) {
 		});
 
 		this.$htmlContent.append(this.$wrapperDiv);
-		this.$wrapperDiv.on("click", this.onWrapperClick.bind(this));
+		this.$wrapperDiv.on("mousedown", this.onWrapperClick.bind(this));
 	};
 
 	// Close the color picker when clicking on the wrapper outside the picker
 	InlineColorPicker.prototype.onWrapperClick = function (event) {
-		// event.preventDefault();
 		if (event.target === this.$wrapperDiv[0]) {
 			this.close();
+		} else if (event.target.tagName !== "INPUT") {
+			event.preventDefault();
 		}
 	};
 
