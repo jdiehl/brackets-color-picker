@@ -37,40 +37,44 @@ define(function (require, exports, module) {
 	var _colorPickers = {};
 
 	function loadCSS() {
-		$("<link rel='stylesheet' type='text/css'>").attr("href", require.toUrl("css/colorpicker.css")).appendTo(window.document.head);
+		$("<link rel='stylesheet' type='text/css'>")
+			.attr("href", require.toUrl("css/colorpicker.css"))
+			.appendTo(window.document.head);
 	}
 
 	// Return the token string that is at the specified position.
 	function getColorTokenAtPos(hostEditor, pos) {
-		var token = hostEditor._codeMirror.getTokenAt(pos);
-
-		// If the pos is at the beginning of a name, token will be the
-		// preceding whitespace or dot. In that case, try the next pos.
-		if (token.string.trim().length === 0 || token.string === ".") {
-			token = hostEditor._codeMirror.getTokenAt({line: pos.line, ch: pos.ch + 1});
-		}
-
-		if (token.className === "atom") {
-			// check for #...
-			var string = token.string;
-
-			if (string.match(/^#[0-9a-f]{3}$/i) || string.match(/^#[0-9a-f]{6}$/i)) {
-				return token;
+		var line = hostEditor._codeMirror.getLine(pos.line);
+		var colors = line.split("#");
+		
+		var index = 0;
+		for (var i in colors) {
+			// skip the first match of the split operation (not a color)
+			if (index > 0) {
+				// match a color (3 or 6 hex characters)
+				var matches = colors[i].match(/^[0-9a-f]{3,6}/i);
+				if (matches.length > 0 && (matches[0].length === 3 || matches[0].length === 6)) {
+					// return the token if the cursor is located inside the color
+					if (pos.ch - 1 <= index + matches[0].length) {
+						return { color: matches[0], pos: { line: pos.line, ch: index }};
+					}
+				}
 			}
-			return null;
+			// advance the index and stop if we are beyond the cursor position
+			// pos.ch - 1 is countered by index - 1
+			// (a cursor positioned on the # should also match the color)
+			index += colors[i].length + 1;
+			if (index > pos.ch) {
+				break;
+			}
 		}
 
 		return null;
 	}
 
-	// convert pos object to index string
-	function posToIndex(pos) {
-		return "" + pos.line + ":" + pos.ch;
-	}
-
 	// remove a closed color picker from the index
 	function onClose(colorPicker) {
-		delete _colorPickers[posToIndex(colorPicker.pos)];
+		delete _colorPickers[colorPicker.pos.line];
 	}
 
 	// provide a new color picker or close an existing one
@@ -82,21 +86,23 @@ define(function (require, exports, module) {
 			return null;
 		}
 
-		// the color starts at the token position + 1 (#)
-		pos.ch = colorToken.start + 1;
-
 		// get an existing color picker and close it
-		var colorPicker = _colorPickers[posToIndex(pos)];
+		var colorPicker = _colorPickers[pos.line];
 		if (colorPicker) {
 			colorPicker.close();
-			return null;
+			if (colorPicker.pos.ch === colorToken.pos.ch) {
+				return null;
+			}
 		}
 
+		// move the cursor to the beginning of the color definition
+		hostEditor.setCursorPos(colorToken.pos.line, colorToken.pos.ch);
+
 		// create a new color picker
-		colorPicker = new InlineColorPicker(colorToken.string.substr(1), pos);
+		colorPicker = new InlineColorPicker(colorToken.color, colorToken.pos);
 		colorPicker.onClose = onClose;
 		colorPicker.load(hostEditor);
-		_colorPickers[posToIndex(pos)] = colorPicker;
+		_colorPickers[pos.line] = colorPicker;
 
 		// resolve
 		var result = new $.Deferred();
