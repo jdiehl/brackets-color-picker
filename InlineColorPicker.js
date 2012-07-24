@@ -65,7 +65,7 @@ define(function (require, exports, module) {
 		});
 
 		this.$htmlContent.append(this.$wrapperDiv);
-		this.$wrapperDiv.on('mousedown', this.onWrapperClick.bind(this));
+		this.$wrapperDiv.on("click", this.onWrapperClick.bind(this));
 	};
 
 	// Close the color picker when clicking on the wrapper outside the picker
@@ -77,10 +77,14 @@ define(function (require, exports, module) {
 	};
 
 	InlineColorPicker.prototype.close = function () {
-		if (this.closed) return;
+		if (this.closed) {
+			return;
+		}
 		this.closed = true;
 		this.hostEditor.removeInlineWidget(this);
-		if (this.onClose) this.onClose(this);
+		if (this.onClose) {
+			this.onClose(this);
+		}
 	};
 
 	InlineColorPicker.prototype.onAdded = function () {

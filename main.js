@@ -21,17 +21,16 @@
  *
  */
 
-
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, brackets, $ */
+/*global window, define, brackets, $ */
 
 define(function (require, exports, module) {
 	'use strict';
-	
+
 	// Brackets modules
 	var EditorManager           = brackets.getModule("editor/EditorManager"),
 		ProjectManager          = brackets.getModule("project/ProjectManager");
-	
+
 	// Local modules
 	var InlineColorPicker       = require("InlineColorPicker");
 
@@ -40,7 +39,7 @@ define(function (require, exports, module) {
 	function loadCSS() {
 		$("<link rel='stylesheet' type='text/css'>").attr("href", require.toUrl("css/colorpicker.css")).appendTo(window.document.head);
 	}
-	
+
 	// Return the token string that is at the specified position.
 	function getColorTokenAtPos(hostEditor, pos) {
 		var token = hostEditor._codeMirror.getTokenAt(pos);
@@ -50,17 +49,17 @@ define(function (require, exports, module) {
 		if (token.string.trim().length === 0 || token.string === ".") {
 			token = hostEditor._codeMirror.getTokenAt({line: pos.line, ch: pos.ch + 1});
 		}
-		
+
 		if (token.className === "atom") {
 			// check for #...
 			var string = token.string;
-			
+
 			if (string.match(/^#[0-9a-f]{3}$/i) || string.match(/^#[0-9a-f]{6}$/i)) {
 				return token;
 			}
 			return null;
 		}
-		
+
 		return null;
 	}
 
@@ -76,10 +75,12 @@ define(function (require, exports, module) {
 
 	// provide a new color picker or close an existing one
 	function colorPickerProvider(hostEditor, pos) {
-		
+
 		// Only provide color picker if there is a HEX color under the cursor
 		var colorToken = getColorTokenAtPos(hostEditor, pos);
-		if (!colorToken) return null;
+		if (!colorToken) {
+			return null;
+		}
 
 		// the color starts at the token position + 1 (#)
 		pos.ch = colorToken.start + 1;
