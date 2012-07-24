@@ -56,7 +56,7 @@ define(function (require, exports, module) {
 				if (matches.length > 0 && (matches[0].length === 3 || matches[0].length === 6)) {
 					// return the token if the cursor is located inside the color
 					if (pos.ch - 1 <= index + matches[0].length) {
-						return { color: matches[0], pos: { line: pos.line, ch: index }};
+						return { string: matches[0], start: index };
 					}
 				}
 			}
@@ -86,20 +86,21 @@ define(function (require, exports, module) {
 			return null;
 		}
 
+		// update the position to the color start
+		pos.ch = colorToken.start;
+
 		// get an existing color picker and close it
 		var colorPicker = _colorPickers[pos.line];
 		if (colorPicker) {
 			colorPicker.close();
-			if (colorPicker.pos.ch === colorToken.pos.ch) {
+			if (pos.ch === colorPicker.pos.ch) {
 				return null;
 			}
 		}
 
-		// move the cursor to the beginning of the color definition
-		hostEditor.setCursorPos(colorToken.pos.line, colorToken.pos.ch);
 
 		// create a new color picker
-		colorPicker = new InlineColorPicker(colorToken.color, colorToken.pos);
+		colorPicker = new InlineColorPicker(colorToken.string, pos);
 		colorPicker.onClose = onClose;
 		colorPicker.load(hostEditor);
 		_colorPickers[pos.line] = colorPicker;
