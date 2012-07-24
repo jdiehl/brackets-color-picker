@@ -70,8 +70,8 @@ define(function (require, exports, module) {
 
 	// Close the color picker when clicking on the wrapper outside the picker
 	InlineColorPicker.prototype.onWrapperClick = function (event) {
-		event.preventDefault();
-		if ($(event.target).closest('div.colorpicker').length === 0) {
+		// event.preventDefault();
+		if (event.target === this.$wrapperDiv[0]) {
 			this.close();
 		}
 	};
