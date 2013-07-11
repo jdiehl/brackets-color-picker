@@ -1,5 +1,7 @@
 # Brackets Color Picker
 
+**The Brackets Color Picker has been discontinued. Please use the built-in color picker.**
+
 Edit hex colors with a color picker.
 
 ## Install
